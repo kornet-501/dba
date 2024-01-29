@@ -62,3 +62,146 @@ E-mail: user.name@example.com
 Невалидный e-mail с использованием кириллических символов:
 Некорректный e-mail: юзер@пример.ком
 
+import spock.lang.Shared
+import spock.lang.Specification
+
+class ErrorDirectoryTest extends Specification {
+    @Shared
+    def app = Application.COMPASS
+
+    def "Проверка данных в справочнике ERROR" () {
+        given: "Предварительная настройка"
+            SetupUtil.chekSqlThenSetup(app)
+
+        when: "Поиск справочника ERROR и получение данных из таблицы"
+            def errorDirectory = findErrorDirectory()
+
+        then: "Проверка данных справочника ERROR"
+            errorDirectory.size() == 7
+            verifyErrorData(errorDirectory)
+
+        cleanup: "Очистка окружения"
+            CleanUtil.safeCallCompassRollBack(app)
+    }
+
+    def findErrorDirectory() {
+        // Ваш код здесь для получения данных из справочника ERROR
+    }
+
+    def verifyErrorData(errorDirectory) {
+        // Требования для справочника ERROR
+        def expectedData = [
+            ["001", "Ошибка №101", "10", "15", "Превышение лимита на количество запросов"],
+            ["002", "Ошибка №202", "5", "7", "Неправильный формат данных"],
+            ["003", "Ошибка №303", "20", "18", "Ошибка соединения с базой данных"],
+            ["004", "Ошибка №404", "8", "9", "Запрашиваемый ресурс не найден"],
+            ["005", "Ошибка №505", "12", "10", "Внутренняя ошибка сервера"],
+            ["006", "Ошибка №606", "3", "4", "Недостаточные права доступа"],
+            ["007", "Ошибка №707", "6", "6", "Проблемы с аутентификацией пользователя"]
+        ]
+        
+        // Проверка данных справочника ERROR
+        errorDirectory.eachWithIndex { entry, index ->
+            entry.КОД == expectedData[index][0]
+            entry.ОШИБКА == expectedData[index][1]
+            entry.ТЕКУЩИЙ == expectedData[index][2]
+            entry.НОВЫЙ == expectedData[index][3]
+            entry.ОПИСАНИЕ == expectedData[index][4]
+        }
+    }
+}
+
+package com.xxx.bm: Это объявление пакета, в котором находится класс BackRefSpeck.
+
+Импорты:
+
+import
+import
+
+Аннотация @Epic('[NovoScript] Обратная ссылка'): Это аннотация от фреймворка Spock, которая помечает класс тестов как эпик и предоставляет краткое описание того, что тестируется.
+
+class BackRefSpeck extends Specification: Этот класс наследует от Specification из Spock и представляет набор тестов.
+
+Поля:
+
+@Shared
+def app = Application.COMPASS;
+
+@Shared
+String text = "Какой-то текст";
+Здесь используется аннотация @Shared, чтобы поля app и text были общими для всех методов теста.
+
+Метод тестирования:
+
+def "Простой тест на обратную ссылку" () {
+    given:
+        SetupUtil.chekSqlThenSetup(app)
+
+    when: "создание объектов модели"
+        def kredPers = new PltfmReference('6781234567896', 'KRED_PERS') as PltfmReference
+        def classList = kredPers.getBackReference()
+
+    then: "проверка того что все создано"
+        classList.find{it.getRefClass() == 'FIN_ORDER' } != null
+
+    when: "вызываем конструктор"
+        def backRefOrder =+classList.find{it.getRefClass() == 'FIN_ORDER' } as PltfmBackReference
+
+    then:
+        backRefOrder.getListDataInView('VM_CRIT_FULL_FIN_ORDER').size() > 0
+
+    cleanup:
+        CleanUtil.safeCallCompassRollBack (app)
+}
+
+given: содержит предусловия для теста.
+when: описывает действия, которые происходят в тесте.
+then: определяет ожидаемые результаты.
+cleanup: указывает на действия, которые следует выполнить после завершения теста, в данном случае, это очистка.
+=================================================================================================================================
+
+package com.example.tests
+
+import com.example.helpers.DatabaseUtil
+import com.example.helpers.CompassUtil
+import spock.lang.Shared
+import spock.lang.Specification
+
+class ErrorReferenceValidationSpec extends Specification {
+
+    @Shared
+    def compass = CompassUtil.getInstance()
+
+    def "Validate 'ERROR' Reference Data"() {
+        given:
+        def errorReferenceData = DatabaseUtil.getErrorReferenceData(compass)
+
+        expect:
+        errorReferenceData.size() == 7
+
+        where:
+        // Проверка данных каждой строки
+        code | errorMessage | current | updated | description
+        "001" | "Ошибка №101" | 10      | 15      | "Превышение лимита на количество запросов"
+        "002" | "Ошибка №202" | 5       | 7       | "Неправильный формат данных"
+        "003" | "Ошибка №303" | 20      | 18      | "Ошибка соединения с базой данных"
+        "004" | "Ошибка №404" | 8       | 9       | "Запрашиваемый ресурс не найден"
+        "005" | "Ошибка №505" | 12      | 10      | "Внутренняя ошибка сервера"
+        "006" | "Ошибка №606" | 3       | 4       | "Недостаточные права доступа"
+        "007" | "Ошибка №707" | 6       | 6       | "Проблемы с аутентификацией пользователя"
+    }
+}
+
+CompassUtil и DatabaseUtil - это вспомогательные классы, которые используются для взаимодействия с базой данных через программу Compass и для получения данных из базы данных соответственно. Они не приведены здесь, но вы можете написать их, используя соответствующие методы и функциональность.
+
+@Shared аннотация используется для обеспечения одного экземпляра compass для всех методов в этом классе теста.
+
+Validate 'ERROR' Reference Data - это название теста.
+
+given блок: Обычно здесь устанавливается начальное состояние теста, но в данном случае оно может быть опущено, так как данные предполагается получать из базы данных.
+
+expect блок: Здесь мы ожидаем, что размер данных, полученных из базы данных, будет равен 7, что соответствует количеству строк в таблице.
+
+where блок: В этом блоке перечислены ожидаемые данные для каждой строки таблицы. Каждый набор данных представлен в виде строк с параметрами, которые будут использованы для проверки фактических данных из базы данных.
+
+code, errorMessage, current, updated и description - это заголовки столбцов таблицы. Каждая строка после where блока представляет собой одну строку данных в таблице.
